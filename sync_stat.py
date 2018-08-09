@@ -1,10 +1,12 @@
+#! /usr/bin/env python
+
 import pickle
 from slackclient import SlackClient
 from sys import argv
 
 def update_status(status, workspaces):
-	for token in workspaces:
-		sc = SlackClient(token)
+	for space in workspaces:
+		sc = SlackClient(space['auth'])
 		sc.api_call(
 			"users.profile.set",
 			profile = status
@@ -17,34 +19,36 @@ def set_status():
 
 def select_workspaces():
 	syncTo = []
-	for workspace in spaces.Spaces:
+	for workspace in Spaces.spaces:
 		selection = input("Sync status to %s? [y/n]" % workspace)
 		if selection == "y" or selection == "Y" or selection == "yes":
-			syncTo.append(spaces.Spaces[workspace])
+			syncTo.append(Spaces.spaces[workspace])
 	return syncTo
 
-def add_space():
-	Spaces = {}
+def add_workspace():
+	spaces = {}
 	add = True
 	while add:
 		workspace = input("Workspace nickname: ")
+		client = input("What chat client is this for? [Slack/Discord]: ")
 		token = input("Workspace legacy token or App token: ")
-		Spaces[workspace] = token
+		spaces[workspace] = { "auth" : token, "client" : client }
 		next = input("Add another workspace?: [y/n]")
 		if next == 'y' or next == "Y" or next == "yes":
 			pass
 		else:
 			add = False
-	pickle.dump(Spaces, open("Spaces.p", "wb"))
+	pickle.dump(spaces, open("spaces.p", "wb"))
+
 try:
 	script, option = argv
 	if option == "add":
-		add_space()
+		add_workspace()
 except:
 	pass
 
-class spaces:
-	Spaces = pickle.load( open("Spaces.p", "rb"))
+class Spaces:
+	spaces = pickle.load( open("spaces.p", "rb"))
 
 status = set_status()
 syncTo = select_workspaces()
