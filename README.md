@@ -7,7 +7,7 @@ Sync Statuses across Slack Workspaces
 workspaces on file
 
 `python sync-staus.py add`
- - This will ask you for a nickname for a workspace and either the [Legacy Token](https://api.slack.com/custom-integrations/legacy-tokens) or the sync-stat app API token. 
+ - This will ask you for a nickname for a workspace and either the [Legacy Token](https://api.slack.com/custom-integrations/legacy-tokens) or ~~the sync-stat app API token~~ (currently only supports Legacy Tokens). 
  It will then ask to set a status.
 
 ## Dependencies
