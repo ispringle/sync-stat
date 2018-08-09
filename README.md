@@ -11,6 +11,7 @@ workspaces on file
  It will then ask to set a status.
 
 ## Dependencies
+ - Python 3.x
  - pickle
  - slackclient
 
