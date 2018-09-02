@@ -1,8 +1,12 @@
-#! /usr/bin/env python
+#!/usr/bin/env python
 
 import pickle
 from slackclient import SlackClient
-from sys import argv
+inport sys
+
+if __name__ == "__main__":
+	main(sys.argv)
+
 
 def update_status(status, workspaces):
 	for space in workspaces:
@@ -25,6 +29,15 @@ def select_workspaces():
 			syncTo.append(Spaces.spaces[workspace])
 	return syncTo
 
+class Spaces(self):
+	
+	def __init__(self):
+		try:
+			self.spaces = pickle.load( open('spaces.p', 'rb'))
+		except:
+			add_workspace()
+			self.spaces = pickle.load( open('spaces.p', 'rb'))
+	
 def add_workspace():
 	spaces = {}
 	add = True
@@ -40,17 +53,25 @@ def add_workspace():
 			add = False
 	pickle.dump(spaces, open("spaces.p", "wb"))
 
-try:
-	script, option = argv
-	if option == "add":
-		add_workspace()
-except:
-	pass
-
-class Spaces:
-	spaces = pickle.load( open("spaces.p", "rb"))
-
 status = set_status()
 syncTo = select_workspaces()
 print("Posting status")
 update_status(status, syncTo)
+
+def main():
+	try:
+		pickle.load( open('spaces.p', 'rb'))
+		spaces = Spaces():
+	except:
+		makeNew = input("No workspaces found. Would you like to setup a workspace?[y/n]: ")
+		if makeNew = 'y' or makeNew = 'Y' or makeNew = 'yes' or makeNew = 'Yes' or makeNew = 'YES':
+			spaces = Spaces()
+		else:
+			quit()
+#try:
+#	script, option = argv
+#	if option == "add":
+#		add_workspace()
+#except:
+#	pass
+
