@@ -1,14 +1,18 @@
 #!/usr/bin/env python
+'''
+sync-stat - Sync a status to multiple workspaces from the command line
+Version: 0.1.0
+'''
 
 import pickle
 from slackclient import SlackClient
 import sys
+import argparse
 
 class Post(object):
 	
 	def __init__(self, status, workspaces):
-		syncTo = self.select_workspaces(workspaces)
-		self.update_status(status, syncTo)
+		self.update_status(status, workspaces)
 	
 	def update_status(self, status, workspaces):
 		for space in workspaces:
@@ -17,14 +21,6 @@ class Post(object):
 				"users.profile.set",
 				profile = status
 				)
-	
-	def select_workspaces(self, work):
-		syncTo = []
-		for workspace in work.spaces:
-			selection = input("Sync status to %s? [y/n]" % workspace)
-			if selection == "y" or selection == "Y" or selection == "yes":
-				syncTo.append(work.spaces[workspace])
-		return syncTo
 
 class Status(object):
 	
@@ -61,23 +57,55 @@ class Spaces(object):
 			else:
 				add = False
 		pickle.dump(spaces, open("spaces.p", "wb"))
+	
+	def select_workspaces(self):
+		syncTo = []
+		for workspace in self.spaces:
+			selection = input("Sync status to %s? [y/n]" % workspace)
+			if selection == "y" or selection == "Y" or selection == "yes":
+				syncTo.append(self.spaces[workspace])
+		return syncTo
+	
+	def select_all(self):
+		syncTo = []
+		for workspace in self.spaces:
+			syncTo.append(self.spaces[workspace])
+		return syncTo
+
+def parse():
+	parser = argparse.ArgumentParser(description="Post status to multiple workspaces at once")
+	parser.add_argument('-a', '--add', help="Add a new workspace", dest='add', action='store_true')
+	parser.add_argument('-s', '--status', help="Status to sync", dest='status')
+	parser.add_argument('-w', '--workspaces', help="Workspaces to sync to, by nickname or 'all' for all spaces",
+						dest='workspaces')
+	parser.add_argument('-e', '--emoji', help="Emoji to sync", dest='emoji')
+	
+	return vars(parser.parse_args())
 
 def main(argv):
 	#Load workspaces if they exist, query to add workspaces if they do not
 	work = Spaces()
 	
-	#Check argv for input
-	#Needs to be replaced with an argv parser
-	try:
-		script, option = argv
-		if option == "add":
-			Spaces.add_workspace()
-	except:
-		pass
+	args = parse()
+	if args['add'] == True:
+		Spaces.add_workspace()
 
+	if args['status'] != None:
+		if args['emoji'] != None:
+			status = { "status_text" : args['status'], "status_emoji" : args['emoji'] }
+		else:
+			status = { "status_text" : args['status'], "status_emoji" : "" }
+	else:
+		status = Status.set()
+	
+	if args['workspaces'] != None:
+		if args['workspaces'] == "all":
+			toSync = work.select_all()
+		else:
+			toSync = work.select_workspaces()
+	
 	#Get status, select workspaces to sync to, and post to selected workspaces
-	status = Status.set()
-	Post(status, work)
+	Post(status, toSync)
 
 if __name__ == "__main__":
 	main(sys.argv)
