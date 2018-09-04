@@ -1,13 +1,15 @@
 #!/usr/bin/env python
 '''
 sync-stat - Sync a status to multiple workspaces from the command line
-Version: 0.1.1
+Version: 0.2.0
 '''
 
-import pickle
+from ruamel.yaml import YAML
 from slackclient import SlackClient
 import sys
 import argparse
+
+yaml = YAML()
 
 class Post(object):
 	
@@ -33,30 +35,33 @@ class Spaces(object):
 	
 	def __init__(self):
 		try:
-			self.spaces = pickle.load(open('spaces.p', 'rb'))
+			with open('spaces.conf', 'r') as f:
+				self.spaces = yaml.load(f)
 		except:
 			makeNew = input("No workspaces found. Would you like to setup a workspace?[y/n]: ")
 			if makeNew == 'y' or makeNew == 'Y' or makeNew == 'yes' or makeNew == 'Yes' or makeNew == 'YES':
+				self.spaces= {}
 				self.add_workspace()
-				self.spaces = pickle.load(open('spaces.p', 'rb'))
+				with open('spaces.conf', 'r') as f:
+					self.spaces = yaml.load(f)
 			else:
 				quit()
 	
 	def add_workspace(self):
-		spaces = {}
 		add = True
 		while add:
 			workspace = input("Workspace nickname: ")
 			#client = input("What chat client is this for? [Slack/Discord]: ")
 			client = "Slack"
 			token = input("Workspace legacy token or App token: ")
-			spaces[workspace] = { "auth" : token, "client" : client }
+			self.spaces[workspace] = { "auth" : token, "client" : client }
 			next = input("Add another workspace?: [y/n]")
 			if next == 'y' or next == "Y" or next == "yes":
 				pass
 			else:
 				add = False
-		pickle.dump(spaces, open("spaces.p", "wb"))
+		with open('spaces.conf', 'w') as f:
+			yaml.dump(self.spaces, f)
 	
 	def select_workspaces(self):
 		syncTo = []
@@ -88,7 +93,7 @@ def main(argv):
 	
 	args = parse()
 	if args['add'] == True:
-		Spaces.add_workspace()
+		work.add_workspace()
 
 	if args['status'] != None:
 		if args['emoji'] != None:
