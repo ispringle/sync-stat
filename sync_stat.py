@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 '''
 sync-stat - Sync a status to multiple workspaces from the command line
-Version: 0.1.0
+Version: 0.2.0
 '''
 
 from ruamel.yaml import YAML
