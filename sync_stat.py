@@ -40,6 +40,7 @@ class Spaces(object):
 		except:
 			makeNew = input("No workspaces found. Would you like to setup a workspace?[y/n]: ")
 			if makeNew == 'y' or makeNew == 'Y' or makeNew == 'yes' or makeNew == 'Yes' or makeNew == 'YES':
+				self.spaces= {}
 				self.add_workspace()
 				with open('spaces.conf', 'r') as f:
 					self.spaces = yaml.load(f)
@@ -47,7 +48,6 @@ class Spaces(object):
 				quit()
 	
 	def add_workspace(self):
-		self.spaces = {}
 		add = True
 		while add:
 			workspace = input("Workspace nickname: ")
@@ -93,7 +93,7 @@ def main(argv):
 	
 	args = parse()
 	if args['add'] == True:
-		Spaces.add_workspace()
+		work.add_workspace()
 
 	if args['status'] != None:
 		if args['emoji'] != None:
