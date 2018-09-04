@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 '''
 sync-stat - Sync a status to multiple workspaces from the command line
-Version: 0.1.0
+Version: 0.1.1
 '''
 
 import pickle
@@ -38,7 +38,7 @@ class Spaces(object):
 			makeNew = input("No workspaces found. Would you like to setup a workspace?[y/n]: ")
 			if makeNew == 'y' or makeNew == 'Y' or makeNew == 'yes' or makeNew == 'Yes' or makeNew == 'YES':
 				self.add_workspace()
-				spaces = pickle.load(open('spaces.p', 'rb'))
+				self.spaces = pickle.load(open('spaces.p', 'rb'))
 			else:
 				quit()
 	
@@ -101,8 +101,8 @@ def main(argv):
 	if args['workspaces'] != None:
 		if args['workspaces'] == "all":
 			toSync = work.select_all()
-		else:
-			toSync = work.select_workspaces()
+	else:
+		toSync = work.select_workspaces()
 	
 	#Get status, select workspaces to sync to, and post to selected workspaces
 	Post(status, toSync)
