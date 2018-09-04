@@ -1,13 +1,14 @@
 #!/usr/bin/env python
 '''
 sync-stat - Sync a status to multiple workspaces from the command line
-Version: 0.2.0
+Version: 0.2.1
 '''
 
 from ruamel.yaml import YAML
 from slackclient import SlackClient
 import sys
 import argparse
+import os
 
 yaml = YAML()
 
@@ -33,16 +34,19 @@ class Status(object):
 
 class Spaces(object):
 	
+	home = os.path.expanduser('~')
+	saveTo = os.path.join(home, '.config/spaces.conf')
+	
 	def __init__(self):
 		try:
-			with open('spaces.conf', 'r') as f:
+			with open(self.saveTo, 'r') as f:
 				self.spaces = yaml.load(f)
 		except:
 			makeNew = input("No workspaces found. Would you like to setup a workspace?[y/n]: ")
 			if makeNew == 'y' or makeNew == 'Y' or makeNew == 'yes' or makeNew == 'Yes' or makeNew == 'YES':
 				self.spaces= {}
 				self.add_workspace()
-				with open('spaces.conf', 'r') as f:
+				with open(self.saveTo, 'r') as f:
 					self.spaces = yaml.load(f)
 			else:
 				quit()
@@ -60,7 +64,7 @@ class Spaces(object):
 				pass
 			else:
 				add = False
-		with open('spaces.conf', 'w') as f:
+		with open(self.saveTo, 'w') as f:
 			yaml.dump(self.spaces, f)
 	
 	def select_workspaces(self):
